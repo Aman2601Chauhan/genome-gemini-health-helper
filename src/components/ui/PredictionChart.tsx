@@ -139,7 +139,7 @@ const PredictionChart: React.FC<PredictionChartProps> = ({
               />
               {predictionStartIndex > 0 && (
                 <CartesianGrid 
-                  x={predictionStartIndex * (100 / data.length) + '%'} 
+                  x={`${predictionStartIndex * (100 / data.length)}%`}
                   width={1}
                   stroke="#999"
                   strokeDasharray="5 5"
