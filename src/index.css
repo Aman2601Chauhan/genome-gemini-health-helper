@@ -122,6 +122,46 @@
   .section-fade-in {
     @apply animate-slide-up;
   }
+  
+  /* New animation utility classes */
+  .stagger-item-1 { animation-delay: 100ms; }
+  .stagger-item-2 { animation-delay: 200ms; }
+  .stagger-item-3 { animation-delay: 300ms; }
+  .stagger-item-4 { animation-delay: 400ms; }
+  .stagger-item-5 { animation-delay: 500ms; }
+  
+  .hover-lift {
+    @apply transition-transform duration-300 ease-out;
+  }
+  .hover-lift:hover {
+    transform: translateY(-5px);
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-300 ease-out;
+  }
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+  
+  .hover-glow {
+    @apply transition-all duration-300 ease-out;
+  }
+  .hover-glow:hover {
+    box-shadow: 0 0 15px rgba(0, 114, 255, 0.5);
+  }
+  
+  .pulsing-element {
+    @apply animate-pulse;
+  }
+  
+  .bounce-element {
+    @apply animate-bounce-subtle;
+  }
+  
+  .rotating-element {
+    @apply animate-spin-slow;
+  }
 }
 
 html {
@@ -157,23 +197,79 @@ html {
   @apply shadow-soft;
 }
 
-/* Animation delay utilities */
-.animation-delay-100 {
-  animation-delay: 100ms;
+/* Improved animation delay utilities */
+.animate-delay-100 {
+  animation-delay: 100ms !important;
 }
 
-.animation-delay-200 {
-  animation-delay: 200ms;
+.animate-delay-200 {
+  animation-delay: 200ms !important;
 }
 
-.animation-delay-300 {
-  animation-delay: 300ms;
+.animate-delay-300 {
+  animation-delay: 300ms !important;
 }
 
-.animation-delay-400 {
-  animation-delay: 400ms;
+.animate-delay-400 {
+  animation-delay: 400ms !important;
 }
 
-.animation-delay-500 {
-  animation-delay: 500ms;
+.animate-delay-500 {
+  animation-delay: 500ms !important;
+}
+
+/* Animation duration utilities */
+.animate-duration-300 {
+  animation-duration: 300ms !important;
+}
+
+.animate-duration-500 {
+  animation-duration: 500ms !important;
+}
+
+.animate-duration-1000 {
+  animation-duration: 1000ms !important;
+}
+
+/* Transition utilities */
+.transition-all-300 {
+  transition: all 300ms ease-in-out;
+}
+
+.transition-transform-300 {
+  transition: transform 300ms ease-in-out;
+}
+
+.transition-opacity-300 {
+  transition: opacity 300ms ease-in-out;
+}
+
+/* Animation fillmode utilities */
+.animate-fill-forwards {
+  animation-fill-mode: forwards !important;
+}
+
+.animate-fill-backwards {
+  animation-fill-mode: backwards !important;
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.highlight-pulse {
+  background: linear-gradient(90deg, rgba(0,114,255,0.1) 0%, rgba(0,198,255,0.2) 50%, rgba(0,114,255,0.1) 100%);
+  background-size: 200% 100%;
+  animation: highlight-pulse 3s infinite;
 }
