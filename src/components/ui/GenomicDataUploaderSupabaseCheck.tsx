@@ -21,15 +21,10 @@ const GenomicDataUploaderSupabaseCheck: React.FC<SupabaseCheckProps> = ({ isConf
       <AlertTitle>Supabase Configuration Required</AlertTitle>
       <AlertDescription>
         <p className="mb-2">
-          Your environment variables for Supabase are not properly configured. The application cannot function correctly without them.
+          Your Supabase connection is not properly configured. The application cannot function correctly without it.
         </p>
-        <ol className="list-decimal pl-5 mb-2 space-y-1">
-          <li>Open the <code>.env.local</code> file in your project</li>
-          <li>Update the <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> values</li>
-          <li>Restart your development server or refresh the page</li>
-        </ol>
-        <p>
-          See the <strong>SETUP_INSTRUCTIONS.md</strong> file for detailed instructions.
+        <p className="mb-2">
+          Please refresh your browser after connecting your Supabase project.
         </p>
       </AlertDescription>
     </Alert>

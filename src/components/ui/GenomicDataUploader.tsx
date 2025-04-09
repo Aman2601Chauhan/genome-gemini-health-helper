@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -16,6 +17,7 @@ import { Upload, File, CheckCircle, AlertTriangle, Info, Loader2 } from 'lucide-
 import { toast } from 'sonner';
 import { analyzeGenomicData } from '@/services/geminiService';
 import GenomicDataUploaderSupabaseCheck from './GenomicDataUploaderSupabaseCheck';
+import { supabase } from '@/integrations/supabase/client';
 
 type GenomicFileType = 'VCF' | 'BAM' | 'FASTQ' | '23andMe' | 'AncestryDNA' | 'Other';
 
@@ -34,16 +36,26 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [fileType, setFileType] = useState<GenomicFileType | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isSupabaseConfigured, setIsSupabaseConfigured] = useState(true);
+  const [isSupabaseConfigured, setIsSupabaseConfigured] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileData, setFileData] = useState<string | null>(null);
 
   const acceptedFileTypes = ['.vcf', '.bam', '.fastq', '.txt', '.csv', '.zip'];
   
   useEffect(() => {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    setIsSupabaseConfigured(!!supabaseUrl && !!supabaseAnonKey);
+    // Check if Supabase is configured by testing a simple query
+    const checkSupabaseConnection = async () => {
+      try {
+        // Simple query to test connection
+        await supabase.from('non_existent_table').select('*').limit(1);
+        setIsSupabaseConfigured(true);
+      } catch (error) {
+        console.error('Error checking Supabase connection:', error);
+        setIsSupabaseConfigured(false);
+      }
+    };
+    
+    checkSupabaseConnection();
   }, []);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -131,8 +143,8 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
     }
 
     if (!isSupabaseConfigured) {
-      toast.error('Supabase configuration required', {
-        description: 'Please configure your Supabase environment variables first.'
+      toast.error('Supabase connection required', {
+        description: 'Please configure your Supabase connection first.'
       });
       return;
     }
