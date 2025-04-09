@@ -2,8 +2,13 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client with environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+// Check if Supabase credentials are available
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Supabase credentials are missing. Please check your environment variables.');
+}
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -57,6 +62,11 @@ interface GeminiResponse {
  */
 export async function analyzeGenomicData(genomicData: string, queryPrompt?: string): Promise<string> {
   try {
+    // Check if Supabase is properly configured
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Supabase is not configured properly. Please check your environment variables.');
+    }
+
     // Call the Supabase Edge Function that will use the Gemini API
     const { data, error } = await supabase.functions.invoke('gemini-analyze', {
       body: {

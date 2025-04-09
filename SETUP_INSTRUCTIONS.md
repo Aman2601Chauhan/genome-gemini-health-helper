@@ -7,11 +7,18 @@
 
 ## Setup Steps
 
-### 1. Supabase Configuration
+### 1. Supabase Configuration (CRITICAL)
 1. Connect your Lovable project to Supabase using the Supabase button in the interface
 2. Create environment variables in your project:
    - Copy `.env.example` to `.env.local`
-   - Fill in your Supabase URL and anon key
+   - Fill in your Supabase URL and anon key from your Supabase dashboard
+   
+   ```
+   VITE_SUPABASE_URL=https://your-project-id.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key
+   ```
+   
+   **IMPORTANT:** The application will not function without these environment variables!
 
 ### 2. Gemini API Key Setup
 1. In your Supabase dashboard, navigate to Edge Functions
@@ -35,4 +42,5 @@
 ## Troubleshooting
 - Check Supabase Edge Function logs for any errors
 - Ensure the Gemini API key is correctly set in Supabase secrets
-- Verify your application has the correct Supabase URL and anon key
+- Verify your application has the correct Supabase URL and anon key in `.env.local`
+- If you see "supabaseUrl is required" error, make sure you've set up the `.env.local` file properly
