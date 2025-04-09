@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -14,7 +13,6 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Insights', path: '/insights' },
-    { name: 'About', path: '/about' },
   ];
 
   useEffect(() => {
