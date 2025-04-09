@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import GenomicDataUploader from '@/components/ui/GenomicDataUploader';
@@ -23,7 +23,6 @@ import {
   PanelRight 
 } from 'lucide-react';
 
-// Sample data for charts
 const biomarkerPredictionData = [
   { time: 'Jan', value: 65, prediction: undefined },
   { time: 'Feb', value: 72, prediction: undefined },
@@ -39,14 +38,300 @@ const biomarkerPredictionData = [
   { time: 'Dec', value: undefined, prediction: 91 },
 ];
 
+const insightCollections = {
+  genetic: [
+    {
+      title: "Personalized Health Insights",
+      insights: [
+        {
+          title: "Vitamin D Metabolism",
+          description: "Your genetic variants suggest you may metabolize vitamin D less efficiently.",
+          priority: "medium"
+        },
+        {
+          title: "Cardiovascular Profile",
+          description: "Your genetic profile indicates a slightly elevated risk for lipid disorders.",
+          priority: "low"
+        },
+        {
+          title: "Caffeine Sensitivity",
+          description: "You have genetic markers associated with slower caffeine metabolism.",
+          priority: "info"
+        }
+      ]
+    },
+    {
+      title: "Genetic Risk Factors",
+      insights: [
+        {
+          title: "Inflammatory Response",
+          description: "Genetic variants suggest you may have a heightened inflammatory response.",
+          priority: "medium"
+        },
+        {
+          title: "Detoxification Pathways",
+          description: "Your genetic profile shows variations in detoxification enzyme efficiency.",
+          priority: "low"
+        },
+        {
+          title: "Oxidative Stress Markers",
+          description: "Genetic markers indicate potential for increased oxidative stress.",
+          priority: "info"
+        }
+      ]
+    },
+    {
+      title: "Genomic Analysis Results",
+      insights: [
+        {
+          title: "Methylation Cycle",
+          description: "Variations in MTHFR gene affecting methylation pathways detected.",
+          priority: "medium"
+        },
+        {
+          title: "Lactose Metabolism",
+          description: "Genetic variants consistent with lactose persistence into adulthood.",
+          priority: "info"
+        },
+        {
+          title: "Bitter Taste Perception",
+          description: "TAS2R38 gene variations indicating heightened sensitivity to bitter compounds.",
+          priority: "low"
+        }
+      ]
+    }
+  ],
+  prediction: [
+    {
+      title: "AI-Generated Recommendations",
+      insights: [
+        {
+          title: "Consider Vitamin D Supplementation",
+          description: "Based on your genetic profile, consider consulting with a healthcare provider about vitamin D supplements.",
+          priority: "medium"
+        },
+        {
+          title: "Regular Cholesterol Monitoring",
+          description: "Your genetic variants suggest benefit from regular lipid panel testing.",
+          priority: "info"
+        },
+        {
+          title: "Caffeine Consumption Timing",
+          description: "Consider limiting caffeine intake to morning hours due to your metabolism profile.",
+          priority: "low"
+        }
+      ]
+    },
+    {
+      title: "Future Health Predictions",
+      insights: [
+        {
+          title: "Stress Response Management",
+          description: "Your genomic data suggests implementing stress reduction techniques may be beneficial.",
+          priority: "medium"
+        },
+        {
+          title: "Exercise Response Optimization",
+          description: "Based on your muscle fiber type genes, high-intensity interval training may be most effective.",
+          priority: "low"
+        },
+        {
+          title: "Sleep Pattern Recommendation",
+          description: "Your circadian rhythm gene variants suggest prioritizing consistent sleep timing.",
+          priority: "info"
+        }
+      ]
+    },
+    {
+      title: "Longevity Insights",
+      insights: [
+        {
+          title: "Telomere Protection Factors",
+          description: "AI analysis suggests focusing on antioxidant-rich foods to support telomere health.",
+          priority: "medium"
+        },
+        {
+          title: "Cognitive Function Support",
+          description: "Recommend regular cognitive challenges based on BDNF gene variations.",
+          priority: "low"
+        },
+        {
+          title: "Metabolic Health Trajectory",
+          description: "Your genetic profile suggests monitoring insulin sensitivity could be beneficial.",
+          priority: "info"
+        }
+      ]
+    }
+  ],
+  medical: [
+    {
+      title: "Medication Response Insights",
+      insights: [
+        {
+          title: "Statin Response Variation",
+          description: "Genetic variants affecting how you may respond to certain statin medications.",
+          priority: "medium"
+        },
+        {
+          title: "NSAID Metabolism",
+          description: "Your genetic profile suggests normal metabolism of common NSAIDs.",
+          priority: "info"
+        },
+        {
+          title: "Antidepressant Response",
+          description: "Variants that may influence response to SSRI antidepressants detected.",
+          priority: "low"
+        }
+      ]
+    },
+    {
+      title: "Pharmaceutical Considerations",
+      insights: [
+        {
+          title: "Beta-Blocker Efficacy",
+          description: "Genetic markers suggest potentially reduced efficacy with certain beta-blockers.",
+          priority: "medium"
+        },
+        {
+          title: "Opioid Sensitivity",
+          description: "CYP2D6 variations indicating potential for altered metabolism of codeine-based medications.",
+          priority: "high"
+        },
+        {
+          title: "Warfarin Dosing",
+          description: "VKORC1 and CYP2C9 variants suggesting non-standard warfarin dosing may be needed.",
+          priority: "medium"
+        }
+      ]
+    },
+    {
+      title: "Treatment Response Profile",
+      insights: [
+        {
+          title: "Metformin Response",
+          description: "Genetic variants suggesting potentially enhanced glucose-lowering effects with metformin.",
+          priority: "low"
+        },
+        {
+          title: "PPI Metabolism",
+          description: "CYP2C19 variations indicating potential for altered proton pump inhibitor metabolism.",
+          priority: "info"
+        },
+        {
+          title: "Antiplatelet Therapy",
+          description: "Genetic markers suggesting standard response to clopidogrel therapy.",
+          priority: "medium"
+        }
+      ]
+    }
+  ],
+  lifestyle: [
+    {
+      title: "Daily Habit Recommendations",
+      insights: [
+        {
+          title: "Optimal Exercise Time",
+          description: "Your circadian rhythm genes suggest morning exercise may be most beneficial.",
+          priority: "low"
+        },
+        {
+          title: "Dietary Sodium Sensitivity",
+          description: "Genetic variants indicate heightened blood pressure response to dietary sodium.",
+          priority: "medium"
+        },
+        {
+          title: "Alcohol Metabolism",
+          description: "ALDH2 gene variation suggesting slower alcohol metabolism.",
+          priority: "info"
+        }
+      ]
+    },
+    {
+      title: "Wellness Optimizations",
+      insights: [
+        {
+          title: "Omega-3 Metabolism",
+          description: "FADS gene cluster variations affecting conversion of plant-based omega-3 fatty acids.",
+          priority: "medium"
+        },
+        {
+          title: "Sleep Duration Needs",
+          description: "DEC2 gene variants suggesting you may require less sleep than average.",
+          priority: "info"
+        },
+        {
+          title: "Caffeine Clearance Rate",
+          description: "CYP1A2 variations indicating slower caffeine metabolism than average.",
+          priority: "low"
+        }
+      ]
+    },
+    {
+      title: "Performance Factors",
+      insights: [
+        {
+          title: "Muscle Composition",
+          description: "ACTN3 genotype suggesting predisposition to endurance over power activities.",
+          priority: "info"
+        },
+        {
+          title: "Recovery Time Requirements",
+          description: "IL6 and TNF gene variations suggesting longer recovery periods between intense workouts.",
+          priority: "medium"
+        },
+        {
+          title: "Hydration Sensitivity",
+          description: "Genetic markers indicating higher than average sensitivity to dehydration.",
+          priority: "low"
+        }
+      ]
+    }
+  ]
+};
+
 const Dashboard = () => {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+  const [displayedInsights, setDisplayedInsights] = useState({
+    genetic: null,
+    prediction: null,
+    medical: null,
+    lifestyle: null
+  });
   
-  const handleUploadComplete = (fileData: string, fileType: string) => {
+  useEffect(() => {
+    if (analysisComplete) {
+      setDisplayedInsights({
+        genetic: getRandomInsight('genetic'),
+        prediction: getRandomInsight('prediction'),
+        medical: getRandomInsight('medical'),
+        lifestyle: getRandomInsight('lifestyle')
+      });
+    }
+  }, [analysisComplete]);
+  
+  const getRandomInsight = (category) => {
+    const collection = insightCollections[category];
+    return collection[Math.floor(Math.random() * collection.length)];
+  };
+  
+  const refreshInsights = () => {
+    setDisplayedInsights({
+      genetic: getRandomInsight('genetic'),
+      prediction: getRandomInsight('prediction'),
+      medical: getRandomInsight('medical'),
+      lifestyle: null
+    });
+    
+    toast.info('Refreshing insights...', {
+      description: 'Updating with new AI-generated insights based on your genomic data',
+    });
+  };
+  
+  const handleUploadComplete = (fileData, fileType) => {
     console.log(`File uploaded: ${fileType}`);
     setFileUploaded(true);
     
@@ -62,7 +347,6 @@ const Dashboard = () => {
       description: 'Your genomic data is being processed by our AI engine',
     });
     
-    // Simulate analysis completion
     setTimeout(() => {
       setIsAnalyzing(false);
       setAnalysisComplete(true);
@@ -79,7 +363,6 @@ const Dashboard = () => {
       
       <main className="flex-grow pt-24 pb-16">
         <div className="container mx-auto px-4">
-          {/* Dashboard Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 animate-fade-in">
             <div>
               <h1 className="text-3xl font-bold mb-2">Genomic Analysis Dashboard</h1>
@@ -101,11 +384,7 @@ const Dashboard = () => {
               <Button 
                 variant="outline" 
                 size="icon"
-                onClick={() => {
-                  toast.info('Refreshing data...', {
-                    description: 'Updating your insights with the latest analysis',
-                  });
-                }}
+                onClick={refreshInsights}
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>
@@ -113,9 +392,7 @@ const Dashboard = () => {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up">
-            {/* Main Content - 2/3 width on large screens */}
             <div className="lg:col-span-2 space-y-6">
-              {/* File Upload Section */}
               {!fileUploaded ? (
                 <div className="bg-white rounded-lg shadow-soft p-6 animate-scale-in">
                   <h2 className="text-xl font-medium mb-4 flex items-center">
@@ -407,80 +684,43 @@ const Dashboard = () => {
               )}
             </div>
             
-            {/* Sidebar - 1/3 width on large screens */}
             <div className="space-y-6">
-              {/* If analysis is complete, show analysis results */}
               {analysisComplete && (
                 <div className="space-y-6 animate-slide-up">
-                  <HealthInsightCard
-                    category="genetic"
-                    title="Personalized Health Insights"
-                    insights={[
-                      {
-                        title: "Vitamin D Metabolism",
-                        description: "Your genetic variants suggest you may metabolize vitamin D less efficiently.",
-                        priority: "medium"
-                      },
-                      {
-                        title: "Cardiovascular Profile",
-                        description: "Your genetic profile indicates a slightly elevated risk for lipid disorders.",
-                        priority: "low"
-                      },
-                      {
-                        title: "Caffeine Sensitivity",
-                        description: "You have genetic markers associated with slower caffeine metabolism.",
-                        priority: "info"
-                      }
-                    ]}
-                  />
+                  {displayedInsights.genetic && (
+                    <HealthInsightCard
+                      category="genetic"
+                      title={displayedInsights.genetic.title}
+                      insights={displayedInsights.genetic.insights}
+                    />
+                  )}
                   
-                  <HealthInsightCard
-                    category="prediction"
-                    title="AI-Generated Recommendations"
-                    insights={[
-                      {
-                        title: "Consider Vitamin D Supplementation",
-                        description: "Based on your genetic profile, consider consulting with a healthcare provider about vitamin D supplements.",
-                        priority: "medium"
-                      },
-                      {
-                        title: "Regular Cholesterol Monitoring",
-                        description: "Your genetic variants suggest benefit from regular lipid panel testing.",
-                        priority: "info"
-                      },
-                      {
-                        title: "Caffeine Consumption Timing",
-                        description: "Consider limiting caffeine intake to morning hours due to your metabolism profile.",
-                        priority: "low"
-                      }
-                    ]}
-                  />
+                  {displayedInsights.prediction && (
+                    <HealthInsightCard
+                      category="prediction"
+                      title={displayedInsights.prediction.title}
+                      insights={displayedInsights.prediction.insights}
+                    />
+                  )}
                   
-                  <HealthInsightCard
-                    category="medical"
-                    title="Medication Response Insights"
-                    insights={[
-                      {
-                        title: "Statin Response Variation",
-                        description: "Genetic variants affecting how you may respond to certain statin medications.",
-                        priority: "medium"
-                      },
-                      {
-                        title: "NSAID Metabolism",
-                        description: "Your genetic profile suggests normal metabolism of common NSAIDs.",
-                        priority: "info"
-                      },
-                      {
-                        title: "Antidepressant Response",
-                        description: "Variants that may influence response to SSRI antidepressants detected.",
-                        priority: "low"
-                      }
-                    ]}
-                  />
+                  {displayedInsights.medical && (
+                    <HealthInsightCard
+                      category="medical"
+                      title={displayedInsights.medical.title}
+                      insights={displayedInsights.medical.insights}
+                    />
+                  )}
+                  
+                  {displayedInsights.lifestyle && (
+                    <HealthInsightCard
+                      category="lifestyle"
+                      title={displayedInsights.lifestyle.title}
+                      insights={displayedInsights.lifestyle.insights}
+                    />
+                  )}
                 </div>
               )}
               
-              {/* Upload New Data */}
               {fileUploaded && (
                 <div className="bg-white rounded-lg shadow-soft p-6 animate-fade-in">
                   <h3 className="font-medium mb-4 flex items-center">

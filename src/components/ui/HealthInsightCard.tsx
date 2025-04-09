@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { 
   Brain, 
@@ -12,8 +11,7 @@ import {
   Dna, 
   ShieldCheck, 
   AlertTriangle, 
-  Info, 
-  ArrowRight
+  Info
 } from 'lucide-react';
 
 type InsightCategory = 'genetic' | 'lifestyle' | 'medical' | 'prediction';
@@ -29,8 +27,6 @@ interface HealthInsightCardProps {
   category: InsightCategory;
   title: string;
   insights: InsightItem[];
-  onAction?: () => void;
-  actionText?: string;
   className?: string;
 }
 
@@ -38,8 +34,6 @@ const HealthInsightCard: React.FC<HealthInsightCardProps> = ({
   category,
   title,
   insights,
-  onAction,
-  actionText = 'Learn more',
   className,
 }) => {
   const categoryIcons = {
@@ -87,7 +81,7 @@ const HealthInsightCard: React.FC<HealthInsightCardProps> = ({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pb-0">
+      <CardContent>
         <ul className="space-y-3">
           {insights.map((insight, index) => (
             <li 
@@ -108,16 +102,6 @@ const HealthInsightCard: React.FC<HealthInsightCardProps> = ({
           ))}
         </ul>
       </CardContent>
-      <CardFooter className="pt-4 pb-4">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="ml-auto flex items-center" 
-          onClick={onAction}
-        >
-          {actionText} <ArrowRight className="ml-1 h-3 w-3" />
-        </Button>
-      </CardFooter>
     </Card>
   );
 };
