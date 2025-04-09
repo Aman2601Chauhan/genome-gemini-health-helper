@@ -1,11 +1,9 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import GenomicDataUploader from '@/components/ui/GenomicDataUploader';
 import { 
   Dna, 
   Brain, 
@@ -57,7 +55,7 @@ const Index = () => {
       <section className="pt-32 pb-20 md:pt-40 md:pb-32 px-4">
         <div className="container mx-auto text-center max-w-4xl">
           <Badge className="mb-4 py-1 px-3 bg-primary/10 text-primary border-primary/20 animate-fade-in">
-            Powered by Gemini 1.5 Flash AI
+            Powered by Gemini 2.0 Flash AI
           </Badge>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 genomic-gradient-text animate-slide-down">
             Unlock Your Genomic Potential
@@ -82,20 +80,6 @@ const Index = () => {
               Explore Features
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
-          </div>
-          
-          <div className="mx-auto w-full max-w-4xl relative animate-blur-in">
-            <div className="absolute inset-0 bg-gradient-to-r from-genomic-blue/20 to-genomic-lightBlue/20 rounded-2xl blur-2xl -z-10 transform scale-105" />
-            <div className="glassmorphism rounded-2xl overflow-hidden shadow-glass p-4 md:p-6">
-              <div className="flex justify-center items-center py-8 md:py-12 px-4 md:px-6 bg-genomic-gray/40 rounded-xl">
-                <img 
-                  src="https://res.cloudinary.com/dpoanqywn/image/upload/v1718040686/genomic-analysis-hero_pxqsot.png" 
-                  alt="Genomic Analysis Dashboard" 
-                  className="max-w-full max-h-[350px] rounded-lg shadow-soft" 
-                  loading="lazy"
-                />
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -161,12 +145,7 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-tr from-genomic-blue/20 to-genomic-lightBlue/20 rounded-2xl blur-xl -z-10" />
-              <GenomicDataUploader className="h-full shadow-glass z-10" />
-            </div>
-            
-            <div className="space-y-6 flex flex-col justify-center">
+            <div className="space-y-6">
               {[
                 {
                   icon: <Microscope className="h-5 w-5 text-genomic-blue" />,
@@ -176,7 +155,7 @@ const Index = () => {
                 {
                   icon: <Network className="h-5 w-5 text-genomic-blue" />,
                   title: "AI-Powered Insights",
-                  description: "Leverage Gemini 1.5 Flash AI to identify patterns and correlations in genetic data that may influence health outcomes."
+                  description: "Leverage Gemini 2.0 Flash AI to identify patterns and correlations in genetic data that may influence health outcomes."
                 },
                 {
                   icon: <ChartLine className="h-5 w-5 text-genomic-blue" />,
@@ -202,6 +181,24 @@ const Index = () => {
                   </div>
                 </div>
               ))}
+            </div>
+            
+            <div className="p-6 bg-white rounded-lg shadow-soft border border-border/40 flex items-center justify-center">
+              <div className="text-center">
+                <Badge variant="outline" className="mb-4">
+                  Supabase Integrated
+                </Badge>
+                <h3 className="text-xl font-semibold mb-2">Enhanced with Cloud Storage</h3>
+                <p className="text-muted-foreground mb-6">
+                  Securely store and analyze your genomic data with our Supabase-powered backend
+                </p>
+                <Button 
+                  className="genomic-gradient-bg shadow-soft"
+                  asChild
+                >
+                  <Link to="/dashboard">Explore Analytics</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

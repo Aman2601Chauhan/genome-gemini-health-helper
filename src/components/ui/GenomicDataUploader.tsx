@@ -13,8 +13,9 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Upload, File, CheckCircle, AlertTriangle, Info } from 'lucide-react';
+import { Upload, File, CheckCircle, AlertTriangle, Info, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { analyzeGenomicData } from '@/services/geminiService';
 
 type GenomicFileType = 'VCF' | 'BAM' | 'FASTQ' | '23andMe' | 'AncestryDNA' | 'Other';
 
@@ -32,7 +33,9 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [fileType, setFileType] = useState<GenomicFileType | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileData, setFileData] = useState<string | null>(null);
 
   const acceptedFileTypes = ['.vcf', '.bam', '.fastq', '.txt', '.csv', '.zip'];
   
@@ -98,9 +101,12 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target?.result && typeof e.target.result === 'string') {
+            const fileContent = e.target.result;
+            setFileData(fileContent);
+            
             if (onUploadComplete) {
               // Only pass first 100 chars of file for demo purposes
-              const previewData = e.target.result.substring(0, 100);
+              const previewData = fileContent.substring(0, 100);
               onUploadComplete(previewData, type);
             }
             
@@ -112,6 +118,35 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
         reader.readAsText(file);
       }
     }, 50);
+  };
+
+  const handleAnalysis = async () => {
+    if (!fileData) {
+      toast.error('No file data available for analysis');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    
+    try {
+      // Call the Gemini service via Supabase Edge Function
+      const analysisResult = await analyzeGenomicData(fileData);
+      
+      toast.success('Analysis completed successfully', {
+        description: 'View your results in the dashboard'
+      });
+      
+      // Here we would typically navigate to results page or update state
+      console.log('Analysis results:', analysisResult);
+      
+    } catch (error) {
+      console.error('Analysis error:', error);
+      toast.error('Analysis failed', {
+        description: 'There was a problem analyzing your genomic data. Please try again.'
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleButtonClick = () => {
@@ -201,7 +236,7 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
         <div className="mt-4">
           <div className="flex items-center text-sm text-muted-foreground">
             <Info className="h-4 w-4 mr-2" />
-            <p>Your data is processed securely and confidentially.</p>
+            <p>Your data is processed securely using Supabase and Gemini AI.</p>
           </div>
           
           {fileType === 'Other' && uploadedFile && (
@@ -217,8 +252,19 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
       
       {uploadedFile && !isUploading && (
         <CardFooter className="flex justify-end">
-          <Button className="genomic-gradient-bg shadow-soft">
-            Begin Analysis
+          <Button 
+            className="genomic-gradient-bg shadow-soft"
+            onClick={handleAnalysis}
+            disabled={isAnalyzing}
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              "Begin Analysis"
+            )}
           </Button>
         </CardFooter>
       )}
