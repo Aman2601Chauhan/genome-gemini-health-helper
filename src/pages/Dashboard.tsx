@@ -411,7 +411,7 @@ const Dashboard = () => {
                     <Brain className="h-12 w-12 mx-auto text-genomic-blue mb-4" />
                     <h2 className="text-xl font-medium mb-2">Your Data is Ready for Analysis</h2>
                     <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                      Our Gemini 1.5 Flash AI model will analyze your genomic data to provide personalized health insights
+                      Our Gemini 2.0 Flash AI model will analyze your genomic data to provide personalized health insights
                     </p>
                     <Button 
                       className="genomic-gradient-bg shadow-soft"
