@@ -131,7 +131,8 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
             setFileData(fileContent);
             
             if (onUploadComplete) {
-              onUploadComplete(fileContent, type);
+              const previewData = fileContent.substring(0, 100);
+              onUploadComplete(previewData, type);
             }
             
             toast.success('File uploaded successfully', {
@@ -171,6 +172,8 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
           description: 'View your results in the dashboard'
         });
       }
+      
+      console.log('Analysis results:', analysisResult);
       
     } catch (error) {
       console.error('Analysis error:', error);

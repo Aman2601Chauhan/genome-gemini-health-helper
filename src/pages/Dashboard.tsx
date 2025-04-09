@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -12,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { analyzeGenomicData } from '@/services/geminiService';
 import { 
   Dna, 
   Brain, 
@@ -25,20 +23,31 @@ import {
   PanelRight 
 } from 'lucide-react';
 
+// Sample data for charts
+const biomarkerPredictionData = [
+  { time: 'Jan', value: 65, prediction: undefined },
+  { time: 'Feb', value: 72, prediction: undefined },
+  { time: 'Mar', value: 68, prediction: undefined },
+  { time: 'Apr', value: 75, prediction: undefined },
+  { time: 'May', value: 82, prediction: undefined },
+  { time: 'Jun', value: 78, prediction: undefined },
+  { time: 'Jul', value: 85, prediction: undefined },
+  { time: 'Aug', value: 89, prediction: undefined },
+  { time: 'Sep', value: undefined, prediction: 92 },
+  { time: 'Oct', value: undefined, prediction: 88 },
+  { time: 'Nov', value: undefined, prediction: 95 },
+  { time: 'Dec', value: undefined, prediction: 91 },
+];
+
 const Dashboard = () => {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
-  const [fileData, setFileData] = useState<string | null>(null);
-  const [analysisResults, setAnalysisResults] = useState<string | null>(null);
-  const [healthInsights, setHealthInsights] = useState<any[]>([]);
-  const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [medicationInsights, setMedicationInsights] = useState<any[]>([]);
   
   const handleUploadComplete = (fileData: string, fileType: string) => {
-    setFileData(fileData);
+    console.log(`File uploaded: ${fileType}`);
     setFileUploaded(true);
     
     toast.success('Genomic data uploaded successfully', {
@@ -46,95 +55,22 @@ const Dashboard = () => {
     });
   };
   
-  const handleStartAnalysis = async () => {
-    if (!fileData) {
-      toast.error('No genomic data available for analysis');
-      return;
-    }
-
+  const handleStartAnalysis = () => {
     setIsAnalyzing(true);
     
     toast.info('Analysis started', {
       description: 'Your genomic data is being processed by our AI engine',
     });
     
-    try {
-      // Call the Gemini API through our service
-      const result = await analyzeGenomicData(fileData);
-      setAnalysisResults(result);
-      
-      // Parse insights from the analysis (simplified parsing logic)
-      const healthItems = extractInsightsFromAnalysis(result, 'health', 3);
-      const recommendationItems = extractInsightsFromAnalysis(result, 'recommendations', 3);
-      const medicationItems = extractInsightsFromAnalysis(result, 'medication', 3);
-      
-      setHealthInsights(healthItems);
-      setRecommendations(recommendationItems);
-      setMedicationInsights(medicationItems);
-      
+    // Simulate analysis completion
+    setTimeout(() => {
+      setIsAnalyzing(false);
       setAnalysisComplete(true);
+      
       toast.success('Analysis complete', {
         description: 'Your genomic insights are now available',
       });
-    } catch (error) {
-      console.error('Analysis error:', error);
-      toast.error('Analysis failed', {
-        description: 'There was an error processing your genomic data',
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  // Extract insights from analysis text
-  const extractInsightsFromAnalysis = (text: string, category: string, count: number) => {
-    // Simple extraction logic - in a real app this would be more sophisticated
-    const lines = text.split('\n');
-    const relevantLines = lines.filter(line => 
-      line.toLowerCase().includes(category) || 
-      (category === 'health' && line.toLowerCase().includes('risk')) ||
-      (category === 'recommendations' && line.toLowerCase().includes('suggest')) ||
-      (category === 'medication' && line.toLowerCase().includes('drug'))
-    );
-    
-    const results = [];
-    for (let i = 0; i < Math.min(count, relevantLines.length); i++) {
-      const line = relevantLines[i];
-      
-      // Extract a title and description as best we can
-      const title = line.split(':')[0] || `${category.charAt(0).toUpperCase() + category.slice(1)} Insight ${i+1}`;
-      const description = line.split(':').slice(1).join(':') || line;
-      
-      // Assign a priority based on keywords
-      let priority: 'high' | 'medium' | 'low' | 'info' = 'info';
-      if (line.toLowerCase().includes('high risk') || line.toLowerCase().includes('urgent') || 
-          line.toLowerCase().includes('important')) {
-        priority = 'high';
-      } else if (line.toLowerCase().includes('medium risk') || line.toLowerCase().includes('moderate') || 
-                line.toLowerCase().includes('consider')) {
-        priority = 'medium';
-      } else if (line.toLowerCase().includes('low risk') || line.toLowerCase().includes('minimal') || 
-                line.toLowerCase().includes('minor')) {
-        priority = 'low';
-      }
-      
-      results.push({
-        title: title.trim().substring(0, 50),
-        description: description.trim().substring(0, 100),
-        priority
-      });
-    }
-    
-    // If we didn't find enough insights, add placeholders
-    while (results.length < count) {
-      results.push({
-        title: `${category.charAt(0).toUpperCase() + category.slice(1)} Analysis`,
-        description: 'Insufficient data for detailed analysis in this category.',
-        priority: 'info'
-      });
-    }
-    
-    return results;
+    }, 3000);
   };
   
   return (
@@ -244,18 +180,95 @@ const Dashboard = () => {
                   </div>
                   
                   <TabsContent value="overview" className="mt-0 space-y-6">
-                    <div className="bg-white rounded-lg shadow-soft p-6">
-                      <h3 className="text-lg font-medium mb-4">Gemini AI Analysis Results</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <PredictionChart 
+                        title="Health Biomarker Prediction"
+                        description="AI-predicted trends based on your genomic profile"
+                        data={biomarkerPredictionData}
+                        yAxisLabel="Value"
+                        xAxisLabel="Month"
+                      />
                       
-                      <div className="prose max-w-full">
-                        {analysisResults ? (
-                          <div className="whitespace-pre-wrap text-sm">
-                            {analysisResults}
+                      <div className="space-y-6">
+                        <div className="bg-white rounded-lg shadow-soft p-4">
+                          <h3 className="text-lg font-medium mb-3">AI Analysis Summary</h3>
+                          <div className="space-y-4">
+                            <div>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span>Analysis Coverage</span>
+                                <span className="font-medium">96%</span>
+                              </div>
+                              <div className="w-full bg-muted rounded-full h-2">
+                                <div className="bg-genomic-blue h-2 rounded-full" style={{ width: '96%' }} />
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span>Confidence Score</span>
+                                <span className="font-medium">89%</span>
+                              </div>
+                              <div className="w-full bg-muted rounded-full h-2">
+                                <div className="bg-genomic-accent h-2 rounded-full" style={{ width: '89%' }} />
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span>Data Quality</span>
+                                <span className="font-medium">92%</span>
+                              </div>
+                              <div className="w-full bg-muted rounded-full h-2">
+                                <div className="bg-green-500 h-2 rounded-full" style={{ width: '92%' }} />
+                              </div>
+                            </div>
                           </div>
-                        ) : (
-                          <p className="text-muted-foreground">No analysis results available.</p>
-                        )}
+                        </div>
+                        
+                        <div className="bg-white rounded-lg shadow-soft p-4">
+                          <h3 className="text-lg font-medium mb-3">Key Insights</h3>
+                          <ul className="space-y-3">
+                            {[
+                              "Found 3 genetic variants associated with medication response",
+                              "Detected 5 lifestyle factors that may influence your genetic expression",
+                              "Identified potential genetic predisposition to vitamin D deficiency"
+                            ].map((insight, idx) => (
+                              <li key={idx} className="flex items-start">
+                                <div className="rounded-full bg-primary/10 p-1 mr-2 mt-0.5">
+                                  <ArrowRight className="h-3 w-3 text-primary" />
+                                </div>
+                                <span className="text-sm">{insight}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
+                    </div>
+                    
+                    <h3 className="text-lg font-medium mt-6 mb-4">Recent Analyses</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <AnalysisCard
+                        title="Medication Response"
+                        description="Analysis of genetic variants related to medication metabolism and efficacy."
+                        type="medication"
+                        status="complete"
+                        timestamp="Today, 2:30 PM"
+                        confidence={0.95}
+                      />
+                      <AnalysisCard
+                        title="Disease Risk Assessment"
+                        description="Evaluation of genetic markers associated with common health conditions."
+                        type="risk"
+                        status="complete"
+                        timestamp="Today, 2:25 PM"
+                        confidence={0.82}
+                      />
+                      <AnalysisCard
+                        title="Ancestry Composition"
+                        description="Analysis of your genetic ancestry and population connections."
+                        type="ancestry"
+                        status="complete"
+                        timestamp="Today, 2:20 PM"
+                        confidence={0.97}
+                      />
                     </div>
                   </TabsContent>
                   
@@ -266,13 +279,40 @@ const Dashboard = () => {
                         AI-generated insights based on your genomic profile and known health correlations
                       </p>
                       
-                      {analysisResults ? (
-                        <div className="prose max-w-full whitespace-pre-wrap text-sm">
-                          {analysisResults}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">No health insights available.</p>
-                      )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <AnalysisCard
+                          title="Cardiovascular Health"
+                          description="Analysis of genes related to heart health, cholesterol metabolism, and cardiovascular function."
+                          type="risk"
+                          status="complete"
+                          timestamp="Today, 2:30 PM"
+                          confidence={0.88}
+                        />
+                        <AnalysisCard
+                          title="Nutrigenomics"
+                          description="How your genes influence your nutritional needs and metabolism of different nutrients."
+                          type="trait"
+                          status="complete"
+                          timestamp="Today, 2:28 PM"
+                          confidence={0.92}
+                        />
+                        <AnalysisCard
+                          title="Immune Response"
+                          description="Genetic factors affecting your immune system function and response to pathogens."
+                          type="risk"
+                          status="complete"
+                          timestamp="Today, 2:25 PM"
+                          confidence={0.85}
+                        />
+                        <AnalysisCard
+                          title="Sleep Patterns"
+                          description="Genetic influences on circadian rhythm, sleep quality, and duration."
+                          type="trait"
+                          status="complete"
+                          timestamp="Today, 2:22 PM"
+                          confidence={0.78}
+                        />
+                      </div>
                     </div>
                   </TabsContent>
                   
@@ -283,13 +323,40 @@ const Dashboard = () => {
                         Discover how your genes influence various physical and physiological traits
                       </p>
                       
-                      {analysisResults ? (
-                        <div className="prose max-w-full whitespace-pre-wrap text-sm">
-                          {analysisResults}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">No trait insights available.</p>
-                      )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <AnalysisCard
+                          title="Fitness Response"
+                          description="How your genes affect your response to different types of exercise and recovery."
+                          type="trait"
+                          status="complete"
+                          timestamp="Today, 2:18 PM"
+                          confidence={0.89}
+                        />
+                        <AnalysisCard
+                          title="Taste Perception"
+                          description="Genetic variants that influence how you perceive different tastes and food preferences."
+                          type="trait"
+                          status="complete"
+                          timestamp="Today, 2:15 PM"
+                          confidence={0.94}
+                        />
+                        <AnalysisCard
+                          title="Caffeine Metabolism"
+                          description="How quickly your body processes caffeine and its effects on your system."
+                          type="medication"
+                          status="complete"
+                          timestamp="Today, 2:12 PM"
+                          confidence={0.91}
+                        />
+                        <AnalysisCard
+                          title="Skin Characteristics"
+                          description="Genetic factors influencing skin properties, aging, and sun sensitivity."
+                          type="trait"
+                          status="complete"
+                          timestamp="Today, 2:10 PM"
+                          confidence={0.86}
+                        />
+                      </div>
                     </div>
                   </TabsContent>
                   
@@ -300,13 +367,40 @@ const Dashboard = () => {
                         Explore your genetic heritage and ancestral connections
                       </p>
                       
-                      {analysisResults ? (
-                        <div className="prose max-w-full whitespace-pre-wrap text-sm">
-                          {analysisResults}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">No ancestry insights available.</p>
-                      )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <AnalysisCard
+                          title="Geographic Origins"
+                          description="Analysis of your ancestral origins across different geographical regions."
+                          type="ancestry"
+                          status="complete"
+                          timestamp="Today, 2:05 PM"
+                          confidence={0.95}
+                        />
+                        <AnalysisCard
+                          title="Haplogroup Analysis"
+                          description="Information about your maternal and paternal lineages throughout human history."
+                          type="ancestry"
+                          status="complete"
+                          timestamp="Today, 2:00 PM"
+                          confidence={0.93}
+                        />
+                        <AnalysisCard
+                          title="Neanderthal Ancestry"
+                          description="Percentage of Neanderthal DNA in your genome and associated traits."
+                          type="ancestry"
+                          status="complete"
+                          timestamp="Today, 1:55 PM"
+                          confidence={0.97}
+                        />
+                        <AnalysisCard
+                          title="Population Connections"
+                          description="Your genetic similarity to different population groups around the world."
+                          type="ancestry"
+                          status="complete"
+                          timestamp="Today, 1:50 PM"
+                          confidence={0.92}
+                        />
+                      </div>
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -321,19 +415,67 @@ const Dashboard = () => {
                   <HealthInsightCard
                     category="genetic"
                     title="Personalized Health Insights"
-                    insights={healthInsights}
+                    insights={[
+                      {
+                        title: "Vitamin D Metabolism",
+                        description: "Your genetic variants suggest you may metabolize vitamin D less efficiently.",
+                        priority: "medium"
+                      },
+                      {
+                        title: "Cardiovascular Profile",
+                        description: "Your genetic profile indicates a slightly elevated risk for lipid disorders.",
+                        priority: "low"
+                      },
+                      {
+                        title: "Caffeine Sensitivity",
+                        description: "You have genetic markers associated with slower caffeine metabolism.",
+                        priority: "info"
+                      }
+                    ]}
                   />
                   
                   <HealthInsightCard
                     category="prediction"
                     title="AI-Generated Recommendations"
-                    insights={recommendations}
+                    insights={[
+                      {
+                        title: "Consider Vitamin D Supplementation",
+                        description: "Based on your genetic profile, consider consulting with a healthcare provider about vitamin D supplements.",
+                        priority: "medium"
+                      },
+                      {
+                        title: "Regular Cholesterol Monitoring",
+                        description: "Your genetic variants suggest benefit from regular lipid panel testing.",
+                        priority: "info"
+                      },
+                      {
+                        title: "Caffeine Consumption Timing",
+                        description: "Consider limiting caffeine intake to morning hours due to your metabolism profile.",
+                        priority: "low"
+                      }
+                    ]}
                   />
                   
                   <HealthInsightCard
                     category="medical"
                     title="Medication Response Insights"
-                    insights={medicationInsights}
+                    insights={[
+                      {
+                        title: "Statin Response Variation",
+                        description: "Genetic variants affecting how you may respond to certain statin medications.",
+                        priority: "medium"
+                      },
+                      {
+                        title: "NSAID Metabolism",
+                        description: "Your genetic profile suggests normal metabolism of common NSAIDs.",
+                        priority: "info"
+                      },
+                      {
+                        title: "Antidepressant Response",
+                        description: "Variants that may influence response to SSRI antidepressants detected.",
+                        priority: "low"
+                      }
+                    ]}
                   />
                 </div>
               )}
@@ -354,11 +496,6 @@ const Dashboard = () => {
                     onClick={() => {
                       setFileUploaded(false);
                       setAnalysisComplete(false);
-                      setAnalysisResults(null);
-                      setHealthInsights([]);
-                      setRecommendations([]);
-                      setMedicationInsights([]);
-                      setFileData(null);
                       
                       toast.info('Ready for new data', {
                         description: 'You can now upload a different genomic data file',
