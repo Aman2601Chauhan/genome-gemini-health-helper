@@ -1,5 +1,4 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Card, 
@@ -16,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { Upload, File, CheckCircle, AlertTriangle, Info, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { analyzeGenomicData } from '@/services/geminiService';
+import GenomicDataUploaderSupabaseCheck from './GenomicDataUploaderSupabaseCheck';
 
 type GenomicFileType = 'VCF' | 'BAM' | 'FASTQ' | '23andMe' | 'AncestryDNA' | 'Other';
 
@@ -34,11 +34,18 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [fileType, setFileType] = useState<GenomicFileType | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSupabaseConfigured, setIsSupabaseConfigured] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileData, setFileData] = useState<string | null>(null);
 
   const acceptedFileTypes = ['.vcf', '.bam', '.fastq', '.txt', '.csv', '.zip'];
   
+  useEffect(() => {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    setIsSupabaseConfigured(!!supabaseUrl && !!supabaseAnonKey);
+  }, []);
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
@@ -75,7 +82,6 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
     setFileType(detectedType);
     setUploadedFile(file);
     
-    // Simulate upload
     simulateUpload(file, detectedType);
   };
 
@@ -97,7 +103,6 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
         clearInterval(interval);
         setIsUploading(false);
         
-        // Simulate reading file
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target?.result && typeof e.target.result === 'string') {
@@ -105,7 +110,6 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
             setFileData(fileContent);
             
             if (onUploadComplete) {
-              // Only pass first 100 chars of file for demo purposes
               const previewData = fileContent.substring(0, 100);
               onUploadComplete(previewData, type);
             }
@@ -126,17 +130,28 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
       return;
     }
 
+    if (!isSupabaseConfigured) {
+      toast.error('Supabase configuration required', {
+        description: 'Please configure your Supabase environment variables first.'
+      });
+      return;
+    }
+
     setIsAnalyzing(true);
     
     try {
-      // Call the Gemini service via Supabase Edge Function
       const analysisResult = await analyzeGenomicData(fileData);
       
-      toast.success('Analysis completed successfully', {
-        description: 'View your results in the dashboard'
-      });
+      if (analysisResult.startsWith('Error') || analysisResult.startsWith('⚠️')) {
+        toast.error('Analysis failed', {
+          description: analysisResult
+        });
+      } else {
+        toast.success('Analysis completed successfully', {
+          description: 'View your results in the dashboard'
+        });
+      }
       
-      // Here we would typically navigate to results page or update state
       console.log('Analysis results:', analysisResult);
       
     } catch (error) {
@@ -168,6 +183,8 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <GenomicDataUploaderSupabaseCheck isConfigured={isSupabaseConfigured} />
+        
         <div
           className={cn(
             "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all duration-300",
@@ -255,7 +272,7 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
           <Button 
             className="genomic-gradient-bg shadow-soft"
             onClick={handleAnalysis}
-            disabled={isAnalyzing}
+            disabled={isAnalyzing || !isSupabaseConfigured}
           >
             {isAnalyzing ? (
               <>
