@@ -46,9 +46,15 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
     // Check if Supabase is configured by testing a simple connection
     const checkSupabaseConnection = async () => {
       try {
-        // Just check if we can connect by getting the URL
-        if (supabase.constructor.name === 'SupabaseClient' && supabase.getUrl()) {
-          setIsSupabaseConfigured(true);
+        // Check if we can connect by verifying the Supabase client exists
+        if (supabase && typeof supabase === 'object') {
+          // Try to access the URL (without using getUrl which doesn't exist)
+          const url = (supabase as any)._url || (supabase as any).url;
+          if (url) {
+            setIsSupabaseConfigured(true);
+          } else {
+            setIsSupabaseConfigured(false);
+          }
         } else {
           setIsSupabaseConfigured(false);
         }

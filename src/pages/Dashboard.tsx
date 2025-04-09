@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -410,39 +409,7 @@ const Dashboard = () => {
             
             {/* Sidebar - 1/3 width on large screens */}
             <div className="space-y-6">
-              {/* User Info */}
-              <div className="bg-white rounded-lg shadow-soft p-6 animate-scale-in">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-medium text-lg">
-                    JD
-                  </div>
-                  <div>
-                    <h3 className="font-medium">John Doe</h3>
-                    <p className="text-sm text-muted-foreground">Last analysis: Today, 2:30 PM</p>
-                  </div>
-                </div>
-                <Separator className="my-4" />
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Data Source</span>
-                    <span>23andMe v5</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">SNPs Analyzed</span>
-                    <span>637,862</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Analysis Quality</span>
-                    <span className="flex items-center">
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        High
-                      </Badge>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Health Insights */}
+              {/* If analysis is complete, show analysis results */}
               {analysisComplete && (
                 <div className="space-y-6 animate-slide-up">
                   <HealthInsightCard
