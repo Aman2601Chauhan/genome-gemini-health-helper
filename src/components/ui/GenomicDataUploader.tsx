@@ -43,12 +43,15 @@ const GenomicDataUploader: React.FC<GenomicDataUploaderProps> = ({
   const acceptedFileTypes = ['.vcf', '.bam', '.fastq', '.txt', '.csv', '.zip'];
   
   useEffect(() => {
-    // Check if Supabase is configured by testing a simple query
+    // Check if Supabase is configured by testing a simple connection
     const checkSupabaseConnection = async () => {
       try {
-        // Simple query to test connection
-        await supabase.from('non_existent_table').select('*').limit(1);
-        setIsSupabaseConfigured(true);
+        // Just check if we can connect by getting the URL
+        if (supabase.constructor.name === 'SupabaseClient' && supabase.getUrl()) {
+          setIsSupabaseConfigured(true);
+        } else {
+          setIsSupabaseConfigured(false);
+        }
       } catch (error) {
         console.error('Error checking Supabase connection:', error);
         setIsSupabaseConfigured(false);
