@@ -520,33 +520,6 @@ const Dashboard = () => {
                       </div>
                     </div>
                     
-                    <h3 className="text-lg font-medium mt-6 mb-4">Recent Analyses</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <AnalysisCard
-                        title="Medication Response"
-                        description="Analysis of genetic variants related to medication metabolism and efficacy."
-                        type="medication"
-                        status="complete"
-                        timestamp="Today, 2:30 PM"
-                        confidence={0.95}
-                      />
-                      <AnalysisCard
-                        title="Disease Risk Assessment"
-                        description="Evaluation of genetic markers associated with common health conditions."
-                        type="risk"
-                        status="complete"
-                        timestamp="Today, 2:25 PM"
-                        confidence={0.82}
-                      />
-                      <AnalysisCard
-                        title="Ancestry Composition"
-                        description="Analysis of your genetic ancestry and population connections."
-                        type="ancestry"
-                        status="complete"
-                        timestamp="Today, 2:20 PM"
-                        confidence={0.97}
-                      />
-                    </div>
                   </TabsContent>
                   
                   <TabsContent value="health" className="mt-0">
